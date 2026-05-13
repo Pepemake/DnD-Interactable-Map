@@ -12,7 +12,7 @@ function App() {
 
   const bounds = [
     [0, 0],
-    [1023, 1228],
+    [5210, 6250],
   ]
 
   function createPoiIcon(marker) {
@@ -97,6 +97,11 @@ function App() {
     currentMarkers.filter((marker) => marker.id !== id)
   )
 }
+function deleteMarker(id) {
+  setMarkers((currentMarkers) =>
+    currentMarkers.filter((marker) => marker.id !== id)
+  )
+}
 
   const buttonStyle = {
     background: '#2a2a2a',
@@ -145,8 +150,8 @@ function App() {
           Borders
         </button>
 
-        <button onClick={() => setMapLayer('/AbyssalGeo.png')} style={buttonStyle}>
-          Geography
+        <button onClick={() => setMapLayer('/London3.png')} style={buttonStyle}>
+          Test Button
         </button>
 
         <div
@@ -257,7 +262,23 @@ function App() {
           border: '3px solid #ef4444',
         }}
       >
-        {marker.name}
+        <button
+  onClick={() => {
+    alert(`${marker.name}\n\n${marker.notes || 'No notes written.'}`)
+  }}
+  style={{
+    width: '100%',
+    textAlign: 'left',
+    background: 'transparent',
+    color: 'white',
+    border: 'none',
+    fontSize: '50px',
+    fontWeight: 'bold',
+    cursor: 'pointer',
+  }}
+>
+  {marker.name}
+</button>
       </div>
     ))}
   </div>
@@ -279,7 +300,23 @@ function App() {
           border: '3px solid #22c55e',
         }}
       >
-        {marker.name}
+        <button
+  onClick={() => {
+    alert(`${marker.name}\n\n${marker.notes || 'No notes written.'}`)
+  }}
+  style={{
+    width: '100%',
+    textAlign: 'left',
+    background: 'transparent',
+    color: 'white',
+    border: 'none',
+    fontSize: '50px',
+    fontWeight: 'bold',
+    cursor: 'pointer',
+  }}
+>
+  {marker.name}
+</button>
       </div>
     ))}
   </div>
@@ -289,7 +326,7 @@ function App() {
         crs={L.CRS.Simple}
         bounds={bounds}
         zoom={0}
-        center={[511, 614]}
+        center={[2605, 3125]}
         style={{ width: '100%', height: '100%' }}
         minZoom={0}
         maxZoom={8}
