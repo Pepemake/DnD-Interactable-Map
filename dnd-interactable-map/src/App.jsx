@@ -1,13 +1,50 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import L from 'leaflet'
 import { MapContainer, ImageOverlay, Marker, Popup } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
+import { createMarker } from './models/markerModel'
+
 
 function App() {
   const [mapLayer, setMapLayer] = useState('/Abyssal.png')
-  const [markers, setMarkers] = useState([])
-  const [completedQuests, setCompletedQuests] = useState([])
-  const [abandonedQuests, setAbandonedQuests] = useState([])
+  const [markers, setMarkers] = useState(() => {
+    try {
+      const savedMarkers = localStorage.getItem('dndMarkers')
+      return savedMarkers ? JSON.parse(savedMarkers) : []
+    } catch {
+      return []
+    }
+  })
+
+  const [completedQuests, setCompletedQuests] = useState(() => {
+    try {
+      const saved = localStorage.getItem('completedQuests')
+      return saved ? JSON.parse(saved) : []
+    } catch {
+      return []
+    }
+  })
+
+  const [abandonedQuests, setAbandonedQuests] = useState(() => {
+    try {
+      const saved = localStorage.getItem('abandonedQuests')
+      return saved ? JSON.parse(saved) : []
+    } catch {
+      return []
+    }
+  })
+
+  useEffect(() => {
+    localStorage.setItem('dndMarkers', JSON.stringify(markers))
+  }, [markers])
+
+  useEffect(() => {
+    localStorage.setItem('completedQuests', JSON.stringify(completedQuests))
+  }, [completedQuests])
+
+  useEffect(() => {
+    localStorage.setItem('abandonedQuests', JSON.stringify(abandonedQuests))
+  }, [abandonedQuests])
   
 
   const bounds = [
@@ -53,16 +90,10 @@ function App() {
 }
 
   function addPoiAtPosition(position, name, type) {
-    const newMarker = {
-      id: Date.now(),
-      type,
-      name,
-      notes: '',
-      position,
-    }
+  const newMarker = createMarker(position, name, type)
 
-    setMarkers((currentMarkers) => [...currentMarkers, newMarker])
-  }
+  setMarkers((currentMarkers) => [...currentMarkers, newMarker])
+}
 
   function updateMarkerPosition(id, newPosition) {
     setMarkers((currentMarkers) =>
@@ -167,7 +198,7 @@ function deleteMarker(id) {
           onClick={() => {
             const name = prompt('Quest Name')
             if (!name) return
-            addPoiAtPosition([511, 614], name, 'quest')
+            addPoiAtPosition([2605, 3125], name, 'quest')
           }}
           style={buttonStyle}
         >
@@ -178,7 +209,7 @@ function deleteMarker(id) {
           onClick={() => {
             const name = prompt('Settlement Name')
             if (!name) return
-            addPoiAtPosition([511, 614], name, 'settlement')
+            addPoiAtPosition([2605, 3125], name, 'settlement')
           }}
           style={buttonStyle}
         >
