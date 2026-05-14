@@ -65,18 +65,6 @@ Layers can be switched instantly through the left-side control panel.
 * Quests moved here when abandoned.
 * Preserves quest information.
 
----
-
-## UI Features
-
-* Large scalable UI.
-* Dark fantasy themed interface.
-* Large readable text.
-* Popup editing system.
-* Separate left and right side control panels.
-
----
-
 # What The Project Currently Has
 
 ## Core Systems
@@ -89,16 +77,6 @@ Layers can be switched instantly through the left-side control panel.
 * Quest log system.
 * Dynamic marker labels.
 * Custom icon system.
-
-## Visual Features
-
-* Dark UI styling.
-* Large popup editing menus.
-* Custom icons.
-* Scalable text.
-* High-resolution map support.
-
----
 
 # Future Features
 
@@ -131,7 +109,6 @@ Layers can be switched instantly through the left-side control panel.
 
 * Population tracking.
 * Faction ownership.
-* Trade routes.
 * Settlement prosperity.
 * Political allegiance.
 * Dynamic settlement states.
@@ -171,18 +148,5 @@ Layers can be switched instantly through the left-side control panel.
 * Fullscreen support.
 * Export/import systems.
 
----
-
-# Long-Term Vision
-
-A complete fantasy campaign management system combining:
-
-* Interactive world maps
-* Quest tracking
-* Settlement management
-* Party progression
-* Lore management
-* DM tools
-* Player interaction
 
 into a single immersive tabletop worldbuilding application.
