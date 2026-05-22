@@ -26,21 +26,21 @@ function LeftPanel({
       }}
     >
       <button
-        onClick={() => setMapLayer('/Abyssal.png')}
+        onClick={() => setMapLayer('/Maps/Abyssal.png')}
         style={buttonStyle}
       >
         Base
       </button>
 
       <button
-        onClick={() => setMapLayer('/AbyssalNat.png')}
+        onClick={() => setMapLayer('/Maps/AbyssalNat.png')}
         style={buttonStyle}
       >
         Borders
       </button>
 
       <button
-        onClick={() => setMapLayer('/London3.png')}
+        onClick={() => setMapLayer('/Maps/London3.png')}
         style={buttonStyle}
       >
         Test Button

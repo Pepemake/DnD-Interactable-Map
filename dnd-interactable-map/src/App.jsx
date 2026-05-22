@@ -8,8 +8,7 @@ import QuestLogPanel from './components/QuestLogPanel'
 import LeftPanel from './components/LeftPanel'
 
 function App() {
-  const [mapLayer, setMapLayer] = useState('/Abyssal.png')
-
+  const [mapLayer, setMapLayer] = useState('/Maps/Abyssal.png')
   const [markers, setMarkers] = useState(() => {
     try {
       const savedMarkers = localStorage.getItem('dndMarkers')
@@ -233,13 +232,28 @@ function App() {
             <Popup offset={[0, -55]}>
               <div
                 style={{
-                width: '420px',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '14px',
-                boxSizing: 'border-box',
-              }}
+                  width: '420px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '14px',
+                  boxSizing: 'border-box',
+                }}
               >
+                {marker.image && (
+                  <img
+                    src={marker.image}
+                    alt={marker.name}
+                    style={{
+                      width: '100%',
+                      maxHeight: '260px',
+                      objectFit: 'contain',
+                      background: '#111',
+                      borderRadius: '10px',
+                      border: '2px solid #555',
+                    }}
+                  />
+                )}
+
                 <input
                   type="text"
                   value={marker.name}
@@ -257,6 +271,32 @@ function App() {
                     height: '44px',
                     fontSize: '18px',
                     fontWeight: 'bold',
+                    padding: '8px 12px',
+                    background: '#111',
+                    color: 'white',
+                    border: '2px solid #777',
+                    borderRadius: '8px',
+                    boxSizing: 'border-box',
+                  }}
+                />
+
+                <input
+                  type="text"
+                  placeholder="Banner Image Path"
+                  value={marker.image || ''}
+                  onChange={(e) => {
+                    setMarkers((currentMarkers) =>
+                      currentMarkers.map((m) =>
+                        m.id === marker.id
+                          ? { ...m, image: e.target.value }
+                          : m
+                      )
+                    )
+                  }}
+                  style={{
+                    width: '100%',
+                    height: '44px',
+                    fontSize: '16px',
                     padding: '8px 12px',
                     background: '#111',
                     color: 'white',
@@ -297,7 +337,9 @@ function App() {
                   {marker.type === 'quest' && (
                     <>
                       <button
-                        onClick={() => archiveMarker(marker.id, 'Completed')}
+                        onClick={() =>
+                          archiveMarker(marker.id, 'Completed')
+                        }
                         style={{
                           flex: 1,
                           fontSize: '16px',
@@ -314,7 +356,9 @@ function App() {
                       </button>
 
                       <button
-                        onClick={() => archiveMarker(marker.id, 'Abandoned')}
+                        onClick={() =>
+                          archiveMarker(marker.id, 'Abandoned')
+                        }
                         style={{
                           flex: 1,
                           fontSize: '16px',
@@ -345,7 +389,7 @@ function App() {
                       borderRadius: '8px',
                       cursor: 'pointer',
                       width: '100%',
-                      boxSizing: 'border-box'
+                      boxSizing: 'border-box',
                     }}
                   >
                     Delete
