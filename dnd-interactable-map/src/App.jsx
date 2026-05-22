@@ -3,6 +3,7 @@ import L from 'leaflet'
 import { MapContainer, ImageOverlay, Marker, Popup } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import { createMarker } from './models/markerModel'
+import { exportSaveFile, readSaveFile } from './services/saveService'
 
 
 function App() {
@@ -24,6 +25,8 @@ function App() {
       return []
     }
   })
+
+
 
   const [abandonedQuests, setAbandonedQuests] = useState(() => {
     try {
@@ -51,6 +54,34 @@ function App() {
     [0, 0],
     [5210, 6250],
   ]
+
+  function exportSave() {
+  exportSaveFile({
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    markers,
+    completedQuests,
+    abandonedQuests,
+  })
+}
+
+function importSave(event) {
+  const file = event.target.files[0]
+  if (!file) return
+
+  readSaveFile(
+    file,
+    (saveData) => {
+      setMarkers(saveData.markers || [])
+      setCompletedQuests(saveData.completedQuests || [])
+      setAbandonedQuests(saveData.abandonedQuests || [])
+      alert('Save imported successfully!')
+    },
+    () => {
+      alert('Import failed. This is not a valid save file.')
+    }
+  )
+}
 
   function createPoiIcon(marker) {
   return L.divIcon({
@@ -215,8 +246,56 @@ function deleteMarker(id) {
         >
           Add Settlement
         </button>
-      </div>
+      <div
+  style={{
+    height: '4px',
+    background: '#555',
+    borderRadius: '999px',
+    margin: '16px 0',
+  }}
+/>
 
+<button onClick={exportSave} style={buttonStyle}>
+  Export Save
+</button>
+
+<div
+  style={{
+    ...buttonStyle,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+    overflow: 'hidden',
+  }}
+>
+  <span>Import Save</span>
+
+  <input
+    type="file"
+    accept=".json"
+    onChange={importSave}
+    style={{
+      position: 'absolute',
+      inset: 0,
+      opacity: 0,
+      cursor: 'pointer',
+    }}
+  />
+</div>
+
+<button
+  onClick={() => {
+    localStorage.setItem('dndMarkers', JSON.stringify(markers))
+    localStorage.setItem('completedQuests', JSON.stringify(completedQuests))
+    localStorage.setItem('abandonedQuests', JSON.stringify(abandonedQuests))
+    alert('Saved!')
+  }}
+  style={buttonStyle}
+>
+  Save
+</button>
+</div>
 <div
   style={{
     position: 'absolute',
