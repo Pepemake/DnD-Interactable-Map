@@ -200,8 +200,6 @@ function deleteMarker(id) {
           flexDirection: 'column',
           gap: 24,
           boxShadow: '0 8px 40px rgba(0,0,0,0.6)',
-          transform: 'scale(2)',
-          transformOrigin: 'top left',
         }}
       >
         <button onClick={() => setMapLayer('/Abyssal.png')} style={buttonStyle}>
@@ -316,7 +314,7 @@ function deleteMarker(id) {
   }}
 >
   <div>
-    <h2 style={{ fontSize: '120px', marginBottom: '16px' }}>
+    <h2 style={{ fontSize: '48px', marginBottom: '16px' }}>
       Active Quests
     </h2>
 
@@ -330,7 +328,7 @@ function deleteMarker(id) {
             padding: '18px 24px',
             borderRadius: '16px',
             marginBottom: '12px',
-            fontSize: '60px',
+            fontSize: '22px',
             border: '3px solid #555',
           }}
         >
@@ -356,7 +354,7 @@ function deleteMarker(id) {
   </div>
 
   <div>
-    <h2 style={{ fontSize: '120px', marginBottom: '16px', color: '#ef4444' }}>
+    <h2 style={{ fontSize: '42px', marginBottom: '16px', color: '#ef4444' }}>
       Abandoned
     </h2>
 
@@ -394,7 +392,7 @@ function deleteMarker(id) {
   </div>
 
   <div>
-    <h2 style={{ fontSize: '120px', marginBottom: '16px', color: '#22c55e' }}>
+    <h2 style={{ fontSize: '42px', marginBottom: '16px', color: '#22c55e' }}>
       Completed
     </h2>
 
