@@ -19,17 +19,20 @@ body {
 .leaflet-popup-content-wrapper {
   background: #1b1b1b;
   color: white;
-  border-radius: 40px;
-  padding: 40px;
-  min-width: 1200px;
-  min-height: 300px;
+  border-radius: 14px;
+  padding: 12px;
   box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+  width: 460px !important;
 }
 
 .leaflet-popup-content {
   margin: 0;
+  justify-content: center;
 }
 
 .leaflet-popup-tip {
   background: #1b1b1b;
+}
+.leaflet-popup {
+  margin-bottom: 0 !important;
 }

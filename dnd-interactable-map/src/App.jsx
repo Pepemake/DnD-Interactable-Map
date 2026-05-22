@@ -4,10 +4,12 @@ import { MapContainer, ImageOverlay, Marker, Popup } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import { createMarker } from './models/markerModel'
 import { exportSaveFile, readSaveFile } from './services/saveService'
-
+import QuestLogPanel from './components/QuestLogPanel'
+import LeftPanel from './components/LeftPanel'
 
 function App() {
   const [mapLayer, setMapLayer] = useState('/Abyssal.png')
+
   const [markers, setMarkers] = useState(() => {
     try {
       const savedMarkers = localStorage.getItem('dndMarkers')
@@ -25,8 +27,6 @@ function App() {
       return []
     }
   })
-
-
 
   const [abandonedQuests, setAbandonedQuests] = useState(() => {
     try {
@@ -48,7 +48,6 @@ function App() {
   useEffect(() => {
     localStorage.setItem('abandonedQuests', JSON.stringify(abandonedQuests))
   }, [abandonedQuests])
-  
 
   const bounds = [
     [0, 0],
@@ -56,75 +55,76 @@ function App() {
   ]
 
   function exportSave() {
-  exportSaveFile({
-    version: 1,
-    exportedAt: new Date().toISOString(),
-    markers,
-    completedQuests,
-    abandonedQuests,
-  })
-}
+    exportSaveFile({
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      markers,
+      completedQuests,
+      abandonedQuests,
+    })
+  }
 
-function importSave(event) {
-  const file = event.target.files[0]
-  if (!file) return
+  function importSave(event) {
+    const file = event.target.files[0]
+    if (!file) return
 
-  readSaveFile(
-    file,
-    (saveData) => {
-      setMarkers(saveData.markers || [])
-      setCompletedQuests(saveData.completedQuests || [])
-      setAbandonedQuests(saveData.abandonedQuests || [])
-      alert('Save imported successfully!')
-    },
-    () => {
-      alert('Import failed. This is not a valid save file.')
-    }
-  )
-}
+    readSaveFile(
+      file,
+      (saveData) => {
+        setMarkers(saveData.markers || [])
+        setCompletedQuests(saveData.completedQuests || [])
+        setAbandonedQuests(saveData.abandonedQuests || [])
+        alert('Save imported successfully!')
+      },
+      () => {
+        alert('Import failed. This is not a valid save file.')
+      }
+    )
+  }
 
   function createPoiIcon(marker) {
-  return L.divIcon({
-    className: 'poi-marker',
-    html: `
-      <div style="display: flex; flex-direction: column; align-items: center;">
-        
-        <img 
-          src="${
-            marker.type === 'settlement'
-              ? '/Icons/Settlement.png'
-              : '/Icons/Ping.png'
-          }"
-          style="width: 256px; height: 256px;"
-        />
-
+    return L.divIcon({
+      className: 'poi-marker',
+      html: `
         <div style="
-          margin-top: 8px;
-          background: rgba(15,15,15,0.9);
-          color: white;
-          font-size: 42px;
-          font-weight: bold;
-          padding: 12px 24px;
-          border-radius: 16px;
-          white-space: nowrap;
-          border: 3px solid #777;
-          text-shadow: 0 2px 4px black;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
         ">
-          ${marker.name}
-        </div>
+          <img 
+            src="${
+              marker.type === 'settlement'
+                ? '/Icons/Settlement.png'
+                : '/Icons/Ping.png'
+            }"
+            style="width: 64px; height: 64px;"
+          />
 
-      </div>
-    `,
-    iconSize: [256, 340],
-    iconAnchor: [128, 256],
-  })
-}
+          <div style="
+            margin-top: 4px;
+            background: rgba(15,15,15,0.9);
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 8px;
+            white-space: nowrap;
+            border: 2px solid #777;
+            text-shadow: 0 1px 2px black;
+          ">
+            ${marker.name}
+          </div>
+        </div>
+      `,
+      iconSize: [64, 90],
+      iconAnchor: [32, 90],
+    })
+  }
 
   function addPoiAtPosition(position, name, type) {
-  const newMarker = createMarker(position, name, type)
-
-  setMarkers((currentMarkers) => [...currentMarkers, newMarker])
-}
+    const newMarker = createMarker(position, name, type)
+    setMarkers((currentMarkers) => [...currentMarkers, newMarker])
+  }
 
   function updateMarkerPosition(id, newPosition) {
     setMarkers((currentMarkers) =>
@@ -137,45 +137,46 @@ function importSave(event) {
   }
 
   function archiveMarker(id, status) {
-  const markerToArchive = markers.find((marker) => marker.id === id)
+    const markerToArchive = markers.find((marker) => marker.id === id)
 
-  if (!markerToArchive) return
+    if (!markerToArchive) return
 
-  if (status === 'Completed') {
-    setCompletedQuests((currentCompleted) => [
-      ...currentCompleted,
-      markerToArchive,
-    ])
+    if (status === 'Completed') {
+      setCompletedQuests((currentCompleted) => [
+        ...currentCompleted,
+        markerToArchive,
+      ])
+    }
+
+    if (status === 'Abandoned') {
+      setAbandonedQuests((currentAbandoned) => [
+        ...currentAbandoned,
+        markerToArchive,
+      ])
+    }
+
+    setMarkers((currentMarkers) =>
+      currentMarkers.filter((marker) => marker.id !== id)
+    )
   }
 
-  if (status === 'Abandoned') {
-    setAbandonedQuests((currentAbandoned) => [
-      ...currentAbandoned,
-      markerToArchive,
-    ])
+  function deleteMarker(id) {
+    setMarkers((currentMarkers) =>
+      currentMarkers.filter((marker) => marker.id !== id)
+    )
   }
-
-  setMarkers((currentMarkers) =>
-    currentMarkers.filter((marker) => marker.id !== id)
-  )
-}
-function deleteMarker(id) {
-  setMarkers((currentMarkers) =>
-    currentMarkers.filter((marker) => marker.id !== id)
-  )
-}
 
   const buttonStyle = {
     background: '#2a2a2a',
     color: 'white',
-    border: '4px solid #777',
-    padding: '32px 48px',
-    borderRadius: '24px',
+    border: '2px solid #777',
+    padding: '14px 24px',
+    borderRadius: '10px',
     cursor: 'pointer',
-    fontSize: '42px',
+    fontSize: '18px',
     fontWeight: 'bold',
-    minWidth: '360px',
-    minHeight: '120px',
+    minWidth: '180px',
+    minHeight: '52px',
   }
 
   return (
@@ -187,256 +188,30 @@ function deleteMarker(id) {
         boxShadow: 'inset 0 0 200px rgba(0,0,0,0.6)',
       }}
     >
-      <div
-        style={{
-          position: 'absolute',
-          top: 30,
-          left: 30,
-          zIndex: 9999,
-          background: 'rgba(15,15,15,0.95)',
-          padding: 32,
-          borderRadius: 28,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 24,
-          boxShadow: '0 8px 40px rgba(0,0,0,0.6)',
-        }}
-      >
-        <button onClick={() => setMapLayer('/Abyssal.png')} style={buttonStyle}>
-          Base
-        </button>
+      <LeftPanel
+        buttonStyle={buttonStyle}
+        setMapLayer={setMapLayer}
+        addPoiAtPosition={addPoiAtPosition}
+        exportSave={exportSave}
+        importSave={importSave}
+        markers={markers}
+        completedQuests={completedQuests}
+        abandonedQuests={abandonedQuests}
+      />
 
-        <button onClick={() => setMapLayer('/AbyssalNat.png')} style={buttonStyle}>
-          Borders
-        </button>
+      <QuestLogPanel
+        markers={markers}
+        abandonedQuests={abandonedQuests}
+        completedQuests={completedQuests}
+      />
 
-        <button onClick={() => setMapLayer('/London3.png')} style={buttonStyle}>
-          Test Button
-        </button>
-
-        <div
-          style={{
-            height: '4px',
-            background: '#555',
-            borderRadius: '999px',
-            margin: '16px 0',
-          }}
-        />
-
-        <button
-          onClick={() => {
-            const name = prompt('Quest Name')
-            if (!name) return
-            addPoiAtPosition([2605, 3125], name, 'quest')
-          }}
-          style={buttonStyle}
-        >
-          Add Quest
-        </button>
-
-        <button
-          onClick={() => {
-            const name = prompt('Settlement Name')
-            if (!name) return
-            addPoiAtPosition([2605, 3125], name, 'settlement')
-          }}
-          style={buttonStyle}
-        >
-          Add Settlement
-        </button>
-      <div
-  style={{
-    height: '4px',
-    background: '#555',
-    borderRadius: '999px',
-    margin: '16px 0',
-  }}
-/>
-
-<button onClick={exportSave} style={buttonStyle}>
-  Export Save
-</button>
-
-<div
-  style={{
-    ...buttonStyle,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
-    overflow: 'hidden',
-  }}
->
-  <span>Import Save</span>
-
-  <input
-    type="file"
-    accept=".json"
-    onChange={importSave}
-    style={{
-      position: 'absolute',
-      inset: 0,
-      opacity: 0,
-      cursor: 'pointer',
-    }}
-  />
-</div>
-
-<button
-  onClick={() => {
-    localStorage.setItem('dndMarkers', JSON.stringify(markers))
-    localStorage.setItem('completedQuests', JSON.stringify(completedQuests))
-    localStorage.setItem('abandonedQuests', JSON.stringify(abandonedQuests))
-    alert('Saved!')
-  }}
-  style={buttonStyle}
->
-  Save
-</button>
-</div>
-<div
-  style={{
-    position: 'absolute',
-    top: 30,
-    right: 30,
-    zIndex: 9999,
-    width: '900px',
-    maxHeight: '90vh',
-    overflowY: 'auto',
-    background: 'rgba(15,15,15,0.95)',
-    padding: 48,
-    borderRadius: 28,
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 28,
-    boxShadow: '0 8px 40px rgba(0,0,0,0.6)',
-    color: 'white',
-  }}
->
-  <div>
-    <h2 style={{ fontSize: '48px', marginBottom: '16px' }}>
-      Active Quests
-    </h2>
-
-    {markers
-      .filter((marker) => marker.type === 'quest')
-      .map((marker) => (
-        <div
-          key={marker.id}
-          style={{
-            background: '#222',
-            padding: '18px 24px',
-            borderRadius: '16px',
-            marginBottom: '12px',
-            fontSize: '22px',
-            border: '3px solid #555',
-          }}
-        >
-          <button
-  onClick={() => {
-    alert(`${marker.name}\n\n${marker.notes || 'No notes written.'}`)
-  }}
-  style={{
-    width: '100%',
-    textAlign: 'left',
-    background: 'transparent',
-    color: 'white',
-    border: 'none',
-    fontSize: '50px',
-    fontWeight: 'bold',
-    cursor: 'pointer',
-  }}
->
-  {marker.name}
-</button>
-        </div>
-      ))}
-  </div>
-
-  <div>
-    <h2 style={{ fontSize: '42px', marginBottom: '16px', color: '#ef4444' }}>
-      Abandoned
-    </h2>
-
-    {abandonedQuests.map((marker) => (
-      <div
-        key={marker.id}
-        style={{
-          background: '#3a1a1a',
-          padding: '18px 24px',
-          borderRadius: '16px',
-          marginBottom: '12px',
-          fontSize: '60px',
-          border: '3px solid #ef4444',
-        }}
-      >
-        <button
-  onClick={() => {
-    alert(`${marker.name}\n\n${marker.notes || 'No notes written.'}`)
-  }}
-  style={{
-    width: '100%',
-    textAlign: 'left',
-    background: 'transparent',
-    color: 'white',
-    border: 'none',
-    fontSize: '50px',
-    fontWeight: 'bold',
-    cursor: 'pointer',
-  }}
->
-  {marker.name}
-</button>
-      </div>
-    ))}
-  </div>
-
-  <div>
-    <h2 style={{ fontSize: '42px', marginBottom: '16px', color: '#22c55e' }}>
-      Completed
-    </h2>
-
-    {completedQuests.map((marker) => (
-      <div
-        key={marker.id}
-        style={{
-          background: '#123020',
-          padding: '18px 24px',
-          borderRadius: '16px',
-          marginBottom: '12px',
-          fontSize: '60px',
-          border: '3px solid #22c55e',
-        }}
-      >
-        <button
-  onClick={() => {
-    alert(`${marker.name}\n\n${marker.notes || 'No notes written.'}`)
-  }}
-  style={{
-    width: '100%',
-    textAlign: 'left',
-    background: 'transparent',
-    color: 'white',
-    border: 'none',
-    fontSize: '50px',
-    fontWeight: 'bold',
-    cursor: 'pointer',
-  }}
->
-  {marker.name}
-</button>
-      </div>
-    ))}
-  </div>
-</div>
-
-<MapContainer
+      <MapContainer
         crs={L.CRS.Simple}
         bounds={bounds}
-        zoom={0}
+        zoom={-2}
         center={[2605, 3125]}
         style={{ width: '100%', height: '100%' }}
-        minZoom={0}
+        minZoom={-3}
         maxZoom={8}
         wheelPxPerZoomLevel={800}
       >
@@ -455,28 +230,38 @@ function deleteMarker(id) {
               },
             }}
           >
-            <Popup offset={[0, -120]}>
-              <div style={{ width: '1200px', display: 'flex', flexDirection: 'column', gap: '32px' }}>
+            <Popup offset={[0, -55]}>
+              <div
+                style={{
+                width: '420px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '14px',
+                boxSizing: 'border-box',
+              }}
+              >
                 <input
                   type="text"
                   value={marker.name}
                   onChange={(e) => {
                     setMarkers((currentMarkers) =>
                       currentMarkers.map((m) =>
-                        m.id === marker.id ? { ...m, name: e.target.value } : m
+                        m.id === marker.id
+                          ? { ...m, name: e.target.value }
+                          : m
                       )
                     )
                   }}
                   style={{
                     width: '100%',
-                    height: '140px',
-                    fontSize: '72px',
+                    height: '44px',
+                    fontSize: '18px',
                     fontWeight: 'bold',
-                    padding: '24px 36px',
+                    padding: '8px 12px',
                     background: '#111',
                     color: 'white',
-                    border: '4px solid #555',
-                    borderRadius: '24px',
+                    border: '2px solid #777',
+                    borderRadius: '8px',
                     boxSizing: 'border-box',
                   }}
                 />
@@ -487,38 +272,41 @@ function deleteMarker(id) {
                   onChange={(e) => {
                     setMarkers((currentMarkers) =>
                       currentMarkers.map((m) =>
-                        m.id === marker.id ? { ...m, notes: e.target.value } : m
+                        m.id === marker.id
+                          ? { ...m, notes: e.target.value }
+                          : m
                       )
                     )
                   }}
                   style={{
                     width: '100%',
-                    height: '420px',
-                    fontSize: '54px',
-                    padding: '32px 36px',
+                    height: '140px',
+                    fontSize: '16px',
+                    padding: '10px 12px',
                     background: '#111',
                     color: 'white',
-                    border: '4px solid #555',
-                    borderRadius: '24px',
+                    border: '2px solid #777',
+                    borderRadius: '8px',
                     resize: 'none',
+                    display: 'block',
                     boxSizing: 'border-box',
                   }}
                 />
 
-                <div style={{ display: 'flex', gap: '24px' }}>
+                <div style={{ display: 'flex', gap: '10px' }}>
                   {marker.type === 'quest' && (
                     <>
                       <button
                         onClick={() => archiveMarker(marker.id, 'Completed')}
                         style={{
                           flex: 1,
-                          fontSize: '48px',
+                          fontSize: '16px',
                           fontWeight: 'bold',
-                          padding: '28px',
+                          padding: '10px',
                           background: '#14532d',
                           color: 'white',
-                          border: '4px solid #22c55e',
-                          borderRadius: '24px',
+                          border: '2px solid #22c55e',
+                          borderRadius: '8px',
                           cursor: 'pointer',
                         }}
                       >
@@ -529,13 +317,13 @@ function deleteMarker(id) {
                         onClick={() => archiveMarker(marker.id, 'Abandoned')}
                         style={{
                           flex: 1,
-                          fontSize: '48px',
+                          fontSize: '16px',
                           fontWeight: 'bold',
-                          padding: '28px',
+                          padding: '10px',
                           background: '#5f1d1d',
                           color: 'white',
-                          border: '4px solid #ef4444',
-                          borderRadius: '24px',
+                          border: '2px solid #ef4444',
+                          borderRadius: '8px',
                           cursor: 'pointer',
                         }}
                       >
@@ -548,14 +336,16 @@ function deleteMarker(id) {
                     onClick={() => deleteMarker(marker.id)}
                     style={{
                       flex: 1,
-                      fontSize: '48px',
+                      fontSize: '16px',
                       fontWeight: 'bold',
-                      padding: '28px',
+                      padding: '10px',
                       background: '#222',
                       color: 'white',
-                      border: '4px solid #777',
-                      borderRadius: '24px',
+                      border: '2px solid #777',
+                      borderRadius: '8px',
                       cursor: 'pointer',
+                      width: '100%',
+                      boxSizing: 'border-box'
                     }}
                   >
                     Delete
