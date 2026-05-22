@@ -282,7 +282,7 @@ function App() {
 
                 <input
                   type="text"
-                  placeholder="Banner Image Path"
+                  placeholder="Picture Image Path"
                   value={marker.image || ''}
                   onChange={(e) => {
                     setMarkers((currentMarkers) =>
